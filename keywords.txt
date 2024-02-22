@@ -1,0 +1,22 @@
+##########
+# classes
+##########
+
+M24C02	KEYWORD1
+
+##########
+# methods and functions
+##########
+
+begin	KEYWORD2
+write	KEYWORD2
+read	KEYWORD2
+wait_write_complete	KEYWORD2
+
+##########
+# register names
+##########
+
+##########
+# constants
+##########
