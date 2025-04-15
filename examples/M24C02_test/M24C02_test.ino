@@ -18,9 +18,11 @@ char buffer[buffer_size];
 
 int arbitraly_length_write_read(const char *w, int length);
 int offset_write_read(void);
+int offset_write_read_arbitrary_addr_long_data(void);
 int single_write(void);
 int single_read(void);
 char *str0(char *b, int start, int end);
+void show_data(uint8_t *dp, int data_length);
 
 void setup() {
   Serial.begin(9600);
@@ -49,7 +51,7 @@ void loop() {
   r <<= 1;
   r |= offset_write_read();
   r <<= 1;
-  r |= offset_write_read();
+  r |= offset_write_read_arbitrary_addr_long_data();
   r <<= 1;
   r |= single_write();
   r <<= 1;
@@ -60,7 +62,7 @@ void loop() {
   Serial.println(r ? "FAIL" : "PASS");
   Serial.println("");
 
-  delay(1000);
+  delay(30000);
 }
 
 int arbitraly_length_write_read(const char *w, int length) {
@@ -88,6 +90,8 @@ int arbitraly_length_write_read(const char *w, int length) {
 
 int offset_write_read(void) {
   char r[buffer_size];
+
+  Serial.println("*** offset_write_read");
 
   eeprom.write(0, (uint8_t *)"000000000000000000000000000000", 31);
 
@@ -126,8 +130,54 @@ int offset_write_read(void) {
   return 0;
 }
 
+int offset_write_read_arbitrary_addr_long_data(void) {
+  constexpr int length = 256;
+  char cb[length];
+  char rb[length];
+  constexpr char test_str0[] = "Hello, M24C02! This is test code for M24C02 class driver. Trying to write and read.";
+
+  Serial.println("*** offset_write_read_arbitrary_addr_long_data");
+
+  memset(cb, '0', sizeof(cb));
+  eeprom.write(0, (uint8_t *)cb, length);
+
+  eeprom.read(0, (uint8_t *)rb, length);
+  Serial.print("initial read :");
+  Serial.println(rb);
+
+  if (memcmp(rb, cb, length)) {
+    Serial.println("FAIL");
+    return 1;
+  }
+
+
+  eeprom.write(3, (uint8_t *)test_str0, sizeof(test_str0));
+  memcpy(cb + 3, test_str0, sizeof(test_str0));
+
+  eeprom.read(0, (uint8_t *)rb, length);
+  Serial.print("2nd read     :");
+  show_data((uint8_t *)rb, length);
+
+  eeprom.write(125, (uint8_t *)test_str0, sizeof(test_str0));
+  memcpy(cb + 125, test_str0, sizeof(test_str0));
+
+  eeprom.read(0, (uint8_t *)rb, length);
+  Serial.print("3rd read     :");
+  show_data((uint8_t *)rb, length);
+
+  if (memcmp(rb, cb, length)) {
+    Serial.println("FAIL");
+    return 1;
+  }
+
+  Serial.println("PASS");
+  return 0;
+}
+
 int single_write(void) {
   char r[buffer_size];
+
+  Serial.println("*** single_write");
 
   Serial.print("*** single_write test : ");
 
@@ -165,6 +215,8 @@ int single_write(void) {
 
 int single_read(void) {
   char r[buffer_size];
+
+  Serial.println("*** single_read");
 
   Serial.print("*** single_read test : ");
 
@@ -212,4 +264,15 @@ char *str0(char *b, int start, int end) {
   *b = 0;
 
   return b0;
+}
+
+void show_data(uint8_t *dp, int data_length) {
+  char s[2] = { 0 };
+
+  for (int i = 0; i < data_length; i++) {
+    *s = *dp++;
+    Serial.print(s);
+  }
+
+  Serial.println("");
 }
