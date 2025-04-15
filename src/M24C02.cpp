@@ -31,11 +31,10 @@ int M24C02::write( int byte_adr, uint8_t data )
 
 int M24C02::write( int byte_adr, const uint8_t *dp, int length )
 {
-#define	PAGE_WRITE_SIZE	16
 	int	w_size;
 	int	written	= 0;
-	
-	if ( byte_adr % PAGE_WRITE_SIZE )
+
+	if ( (byte_adr % PAGE_WRITE_SIZE) && !within_a_page( byte_adr, length ) )
 	{
 		uint8_t	data[ PAGE_WRITE_SIZE ];
 		int		start	= (byte_adr / PAGE_WRITE_SIZE) * PAGE_WRITE_SIZE;
@@ -55,7 +54,7 @@ int M24C02::write( int byte_adr, const uint8_t *dp, int length )
 		byte_adr	+= w_size;
 		dp			+= w_size;
 	}
-	
+
 	while ( length ) {
 		w_size	= ( PAGE_WRITE_SIZE < length ) ? PAGE_WRITE_SIZE : length;
 
@@ -97,7 +96,6 @@ uint8_t M24C02::read( int byte_adr )
 
 int M24C02::read( int byte_adr, uint8_t *dp, int length )
 {
-#define	PAGE_READ_SIZE	32
 	int	r_size;
 	int	read_done	= 0;
 
