@@ -54,14 +54,32 @@ public:
 	 *
 	 * @param byte_adr byte address
 	 * @param data 1 byte data for writing
+	 * @return size of data written or -10 if failed (timeout)
 	 */
 	int write( int byte_adr, uint8_t data );	
+
+	/** Write data
+	 *
+	 * @param byte_adr byte address. The address can be arbitrary. It not needed to be aligned to page size.
+	 * @param dp pointer to data array
+	 * @param length data size
+	 * @return size of data written or -10 if failed (timeout)
+	 */
 	int write( int byte_adr, const uint8_t *dp, int length );	
 
 	/** Read data
 	 *
 	 * @param byte_adr byte address
 	 * @return 1 byte read data
+	 */
+	uint8_t read( int byte_adr );	
+
+	/** Read data
+	 *
+	 * @param byte_adr byte address. The address can be arbitrary. It not needed to be aligned to page size.
+	 * @param dp pointer to data array
+	 * @param length data size
+	 * @return size of data read
 	 */
 	uint8_t read( int byte_adr );	
 	int read( int byte_adr, uint8_t *dp, int length );	
