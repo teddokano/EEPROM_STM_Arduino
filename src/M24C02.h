@@ -83,6 +83,15 @@ public:
 	 */
 	int read( int byte_adr, uint8_t *dp, int length );
 
+	/** Update data
+	 * 	The single byte data is written only when the data is different from the existing one
+	 *
+	 * @param byte_adr byte address
+	 * @param data 1 byte data for writing
+	 * @return size of data written or -10 if failed (timeout)
+	 */
+	int update( int byte_adr, uint8_t data );	
+
 private:
 	constexpr static int PAGE_WRITE_SIZE	= 16;
 	constexpr static int PAGE_READ_SIZE		= 32;

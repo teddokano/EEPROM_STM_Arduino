@@ -26,7 +26,7 @@ int M24C02::write( int byte_adr, uint8_t data )
 	if ( !wait_write_complete( 10 ) )
 		return -10;
 	
-	return r;
+	return 1;
 }
 
 int M24C02::write( int byte_adr, const uint8_t *dp, int length )
@@ -92,3 +92,12 @@ int M24C02::read( int byte_adr, uint8_t *dp, int length )
 	
 	return read_done;
 }
+
+int M24C02::update( int byte_adr, uint8_t data )
+{
+	if ( data == read( byte_adr ) )
+		return 0;
+	
+	return	write( byte_adr, data );
+}
+

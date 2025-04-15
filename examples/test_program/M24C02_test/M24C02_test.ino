@@ -21,6 +21,7 @@ int offset_write_read(void);
 int offset_write_read_arbitrary_addr_long_data(void);
 int single_write(void);
 int single_read(void);
+int update(void);
 char *str0(char *b, int start, int end);
 void show_data(uint8_t *dp, int data_length);
 
@@ -57,12 +58,15 @@ void loop() {
   r <<= 1;
   r |= single_read();
   r <<= 1;
+  r |= update();
+  r <<= 1;
+
 
   Serial.print("OVERALL RESULT : ");
   Serial.println(r ? "FAIL" : "PASS");
   Serial.println("");
 
-  delay(30000);
+  delay(300000);
 }
 
 int arbitraly_length_write_read(const char *w, int length) {
@@ -248,6 +252,51 @@ int single_read(void) {
       Serial.println("FAIL");
       return 1;
     }
+
+
+  Serial.println("PASS");
+  return 0;
+}
+
+int update(void) {
+  char wb[27] = { 0 };
+  char rb[27] = { 0 };
+  int err;
+
+  Serial.println("*** update");
+
+  for (int i = 0; i < 26; i++)
+    wb[i] = i + 'A';
+
+  eeprom.write(0, (uint8_t *)wb, sizeof(wb));
+
+  eeprom.read(0, (uint8_t *)rb, 26);
+  Serial.println(rb);
+
+  for (int i = 0; i < 26; i++) {
+    err = eeprom.update(i, wb[i]);
+
+    if (0 != err)
+      return 1;
+  }
+
+  for (int i = 0; i < 26; i++)
+    wb[i] = i + 'a';
+
+  for (int i = 0; i < 26; i++) {
+    err = eeprom.update(i, wb[i]);
+
+    if (!(1 == err))
+      return 1;
+  }
+
+  eeprom.read(0, (uint8_t *)rb, 26);
+  Serial.println(rb);
+
+  if (strncmp(wb, rb, 26)) {
+    Serial.println("FAIL");
+    return 1;
+  }
 
 
   Serial.println("PASS");
