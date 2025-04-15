@@ -86,11 +86,6 @@ public:
 private:
 	constexpr static int PAGE_WRITE_SIZE	= 16;
 	constexpr static int PAGE_READ_SIZE		= 32;
-	
-	inline int within_a_page( int byte_adr, int length )
-	{
-		return (byte_adr / PAGE_WRITE_SIZE) == ((byte_adr + length - 1) / PAGE_WRITE_SIZE);
-	}
 };
 
 #endif //	ARDUINO_M24C02_H
