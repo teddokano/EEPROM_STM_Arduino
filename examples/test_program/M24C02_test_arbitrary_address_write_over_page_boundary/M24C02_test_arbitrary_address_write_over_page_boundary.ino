@@ -54,7 +54,7 @@ void loop() {
   Serial.print("written into EEPROM    :");
   Serial.println(clear0);
 
-  eeprom.read(0, (uint8_t *)s, sizeof(test_str0));
+  eeprom.read(0, (uint8_t *)s, sizeof(clear0));
 
   Serial.print("read back from EEPROM  :");
   show_data((uint8_t *)s, length);
