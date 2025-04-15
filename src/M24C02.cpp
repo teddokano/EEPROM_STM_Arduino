@@ -34,30 +34,10 @@ int M24C02::write( int byte_adr, const uint8_t *dp, int length )
 	int	w_size;
 	int	written	= 0;
 
-	if ( (byte_adr % PAGE_WRITE_SIZE) && !within_a_page( byte_adr, length ) )
-	{
-		uint8_t	data[ PAGE_WRITE_SIZE ];
-		int		start	= (byte_adr / PAGE_WRITE_SIZE) * PAGE_WRITE_SIZE;
-		int		offset	= byte_adr % PAGE_WRITE_SIZE;
-		int		w_size	= PAGE_WRITE_SIZE - offset;
-
-		read( start, data, PAGE_WRITE_SIZE );
-		memcpy( data + offset, dp, w_size );
-		
-		if ( !wait_write_complete( 10 ) )
-			return -10;
-
-		reg_w( start, data, PAGE_WRITE_SIZE );
-
-		length		-= w_size;
-		written		+= w_size;
-		byte_adr	+= w_size;
-		dp			+= w_size;
-	}
-
 	while ( length ) {
 		w_size	= ( PAGE_WRITE_SIZE < length ) ? PAGE_WRITE_SIZE : length;
-
+		w_size	= ( PAGE_WRITE_SIZE - (byte_adr % PAGE_WRITE_SIZE) < w_size ) ? PAGE_WRITE_SIZE - (byte_adr % PAGE_WRITE_SIZE) : w_size;
+		
 		if ( !wait_write_complete( 10 ) )
 			return -10;
 		
